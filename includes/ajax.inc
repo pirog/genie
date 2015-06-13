@@ -211,7 +211,7 @@
  *
  * When returning an Ajax command array, it is often useful to have
  * status messages rendered along with other tasks in the command array.
- * In that case the the Ajax commands array may be constructed like this:
+ * In that case the Ajax commands array may be constructed like this:
  * @code
  *   $commands = array();
  *   $commands[] = ajax_command_replace(NULL, $output);
@@ -276,7 +276,7 @@ function ajax_render($commands = array()) {
 
   $extra_commands = array();
   if (!empty($styles)) {
-    $extra_commands[] = ajax_command_prepend('head', $styles);
+    $extra_commands[] = ajax_command_add_css($styles);
   }
   if (!empty($scripts_header)) {
     $extra_commands[] = ajax_command_prepend('head', $scripts_header);
@@ -292,7 +292,7 @@ function ajax_render($commands = array()) {
   $scripts = drupal_add_js();
   if (!empty($scripts['settings'])) {
     $settings = $scripts['settings'];
-    array_unshift($commands, ajax_command_settings(call_user_func_array('array_merge_recursive', $settings['data']), TRUE));
+    array_unshift($commands, ajax_command_settings(drupal_array_merge_deep_array($settings['data']), TRUE));
   }
 
   // Allow modules to alter any Ajax response.
@@ -328,16 +328,8 @@ function ajax_get_form() {
     // system/ajax without actually viewing the concerned form in the browser.
     // This is likely a hacking attempt as it never happens under normal
     // circumstances, so we just do nothing.
-    // This also seems to happen when you try to use #ajax in an install profile
-    // form. So we can check for that scenario as well and just load the form
-    // from its constructor function instead.
-    if (isset($_POST['form_id']) && isset($GLOBALS['conf']['install_task']) && $GLOBALS['conf']['install_task'] !== 'done') {
-      $form = drupal_get_form($_POST['form_id']);
-    }
-    else {
-      watchdog('ajax', 'Invalid form POST data.', array(), WATCHDOG_WARNING);
-      drupal_exit();
-    }
+    watchdog('ajax', 'Invalid form POST data.', array(), WATCHDOG_WARNING);
+    drupal_exit();
   }
 
   // When a page level cache is enabled, the form-build id might have been
@@ -447,14 +439,6 @@ function ajax_base_page_theme() {
     // page cache.
     if ($theme === variable_get('theme_default', 'bartik') || drupal_valid_token($token, $theme)) {
       return $theme;
-    }
-
-    // If running an AJAX request on an install profile form this will always
-    // return Bartik which is bad since Seven is the install profile theme.
-    // Here is a weak check that probably needs some TLC to return the right
-    // value.
-    if ($theme === 'undefined' && isset($GLOBALS['conf']['install_task']) && $GLOBALS['conf']['install_task'] !== 'done') {
-      return 'seven';
     }
   }
 }
@@ -1271,5 +1255,28 @@ function ajax_command_update_build_id($form) {
     'command' => 'updateBuildId',
     'old' => $form['#build_id_old'],
     'new' => $form['#build_id'],
+  );
+}
+
+/**
+ * Creates a Drupal Ajax 'add_css' command.
+ *
+ * This method will add css via ajax in a cross-browser compatible way.
+ *
+ * This command is implemented by Drupal.ajax.prototype.commands.add_css()
+ * defined in misc/ajax.js.
+ *
+ * @param $styles
+ *   A string that contains the styles to be added.
+ *
+ * @return
+ *   An array suitable for use with the ajax_render() function.
+ *
+ * @see misc/ajax.js
+ */
+function ajax_command_add_css($styles) {
+  return array(
+    'command' => 'add_css',
+    'data' => $styles,
   );
 }
