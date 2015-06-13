@@ -75,7 +75,6 @@ function total_domination_form_of_doom_form($form, &$form_state) {
  * Validate the form of doom
  */
 function total_domination_form_of_doom_form_validate($form, &$form_state) {
-  $test = '1';
   // Make sure the defualt options isnt chosen.
   if ($form_state['values']['cms'] == '00') {
     form_set_error('cms', 'You must select a DROID');

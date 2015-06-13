@@ -5,7 +5,7 @@
  */
 
 /*
- * Batch for drupal function
+ * Batch check for Drupal function.
  */
 function total_domination_drupal_batch($url, &$context) {
   // Update our progress information.
@@ -14,107 +14,24 @@ function total_domination_drupal_batch($url, &$context) {
   }
   $context['sandbox']['progress']++;
 
-  // Many tries and headaches but this curl gets em all
-  $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_URL,$url);
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10000);
-  curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-  $check = curl_exec($ch);
-  $info = curl_getinfo($ch);
-  curl_close($ch);
+  $checks = _total_domination_curl($url);
+  list($check, $info) = $checks;
 
-  if (strpos($check, 'not-logged-in') !== false) {
-    $title_check = preg_match("/<title>(.*)<\/title>/siU", $check, $title_matches);
-    if (!$title_check) { return null; }
-    $title_pre = preg_replace('/\s+/', ' ', $title_matches[1]);
-    $title_pre = trim($title_pre);
-    $title_clean = explode('|',$title_pre);
-    $count = count($title_clean);
-    if ($count == 1) {
-      $title = $title_clean[0];
-    } else {
-      $new_url = explode('http://www.', trim($url));
-      $url_check = substr($new_url[1], 0, -4);
-      if ($url_check == strtolower(trim($title_clean[0]))) {
-        $title = $title_clean[0];
-      } elseif ($url_check == strtolower(trim($title_clean[1]))){
-        $title = $title_clean[1];
-      } else {
-        $title = ucfirst($url_check);
-      }
+  // Is not a bad page
+  if ($info['http_code']) {
+    $drupal = _total_domination_check_drupal($url, $check);
+    if ($drupal) {
+      list($title, $cms) = $drupal;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
     }
-    $count = strlen($title);
-    if ($count > 200) {
-      $title = substr($title, 0, 200);
-    }
-
-
-    $xh=curl_init();
-    curl_setopt($xh, CURLOPT_URL,$url . '/CHANGELOG.txt');
-    curl_setopt($xh, CURLOPT_CONNECTTIMEOUT, 2);
-    curl_setopt($xh, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($xh, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($xh, CURLOPT_BINARYTRANSFER, true);
-    curl_setopt($xh, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($xh, CURLOPT_TIMEOUT_MS, 10000);
-    curl_setopt($xh, CURLOPT_USERAGENT, $agent);
-    $version = curl_exec($xh);
-    curl_close($xh);
-    $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
-    $ver_get = substr(trim($ver_get), -4);
-
-    // get version #, tried a few different cases (like switch) but this worked the best
-    if (substr(trim($ver_get), -1) == ',') {
-      $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
-      $ver_get = substr(trim($ver_get), -5, -1);
-      $ver_get = 'Drupal ' . substr(trim($ver_get), 0, 1) . ' Site';
-    } elseif (substr(trim($ver_get), 0, 1) != '7') {
-      if (substr(trim($ver_get), 0, 1) != '6') {
-        if (substr(trim($ver_get), 0, 1) != '5') {
-          if (substr(trim($ver_get), 0, 1) != '8') {
-            if (substr(trim($ver_get), 0, 1) != '4') {
-              $ver_get = 'Drupal 7 Site'; //Unkown who cares.
-            }
-          }
-        }
-      }
-    } else {
-      $ver_get = 'Drupal ' . substr(trim($ver_get), 0, 1) . ' Site';
-    }
-
-    $node = new stdClass();
-    $node->type = 'winning';
-    node_object_prepare($node);
-    $node->title    = $title;
-    $node->language = LANGUAGE_NONE;
-    $node->field_drupal_version[$node->language][0]['value'] = $ver_get;
-    $node->field_drupal_version[$node->language][0]['safe_value'] = $ver_get;
-    $node->field_url[$node->language][0]['url'] =  check_plain($url);
-    $node->field_url[$node->language][0]['title'] =  check_plain($url);
-    $node->field_url[$node->language][0]['display_url'] =  check_plain($url);
-    $node->field_exported[$node->language][0]['value'] =  0;
-    node_save($node);
-
-    $context['results'][] = $node;
-    //$context['results'][] = check_plain($url) . $drupal;
   }
-
-  else {
-    //watchdog('WTF', 'WTF - ' . $info['http_code']);
-  }
-
 
   $context['message'] = t('Now assimilating %url', array('%url' => $url));
 }
 
 /*
- * Batch for ektron function
+ * Batch check for Ektron function.
  */
 function total_domination_ektron_batch($url, &$context) {
   // Update our progress information.
@@ -123,71 +40,24 @@ function total_domination_ektron_batch($url, &$context) {
   }
   $context['sandbox']['progress']++;
 
-  // Many tries and headaches but this curl gets em all
-  $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_URL,$url);
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10000);
-  curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-  $check = curl_exec($ch);
-  $info = curl_getinfo($ch);
-  curl_close($ch);
+  $checks = _total_domination_curl($url);
+  list($check, $info) = $checks;
 
-
-  if (strpos($check, 'EktronClientManager') !== false) {
-    $title_check = preg_match("/<title>(.*)<\/title>/siU", $check, $title_matches);
-    if (!$title_check) { return null; }
-    $title_pre = preg_replace('/\s+/', ' ', $title_matches[1]);
-    $title_pre = trim($title_pre);
-    $title_clean = explode('|',$title_pre);
-    $count = count($title_clean);
-    if ($count == 1) {
-      $title = $title_clean[0];
-    } else {
-      $new_url = explode('http://www.', trim($url));
-      $url_check = substr($new_url[1], 0, -4);
-      if ($url_check == strtolower(trim($title_clean[0]))) {
-        $title = $title_clean[0];
-      } elseif ($url_check == strtolower(trim($title_clean[1]))){
-        $title = $title_clean[1];
-      } else {
-        $title = ucfirst($url_check);
-      }
+  // Is not a bad page
+  if ($info['http_code']) {
+    $ektron = _total_domination_check_ektron($url, $check);
+    if ($ektron) {
+      list($title, $cms) = $ektron;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
     }
-    $count = strlen($title);
-    if ($count > 200) {
-      $title = substr($title, 0, 200);
-    }
-
-    $node = new stdClass();
-    $node->type = 'winning';
-    node_object_prepare($node);
-    $node->title    = $title;
-    $node->language = LANGUAGE_NONE;
-    $node->field_drupal_version[$node->language][0]['value'] = 'Ektron';
-    $node->field_drupal_version[$node->language][0]['safe_value'] = 'Ektron';
-    $node->field_url[$node->language][0]['url'] =  check_plain($url);
-    $node->field_url[$node->language][0]['title'] =  check_plain($url);
-    $node->field_url[$node->language][0]['display_url'] =  check_plain($url);
-    $node->field_exported[$node->language][0]['value'] =  0;
-    node_save($node);
-    $context['results'][] = $node;
   }
-  else {
-    //watchdog('WTF', 'WTF - ' . $info['http_code']);
-  }
-
 
   $context['message'] = t('Now assimilating %url', array('%url' => $url));
 }
 
 /*
- * Batch for all function
+ * Batch for ALL CMS function.
  */
 function total_domination_all_batch($url, &$context) {
   // Update our progress information.
@@ -196,140 +66,26 @@ function total_domination_all_batch($url, &$context) {
   }
   $context['sandbox']['progress']++;
 
-  // Many tries and headaches but this curl gets em all
-  $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
-  $ch=curl_init();
-  curl_setopt($ch, CURLOPT_URL,$url);
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10000);
-  curl_setopt($ch, CURLOPT_USERAGENT, $agent);
-  $check = curl_exec($ch);
-  $info = curl_getinfo($ch);
-  curl_close($ch);
+  $checks = _total_domination_curl($url);
+  list($check, $info) = $checks;
 
-  if (strpos($check, 'not-logged-in') !== false) {
-    $title_check = preg_match("/<title>(.*)<\/title>/siU", $check, $title_matches);
-    if (!$title_check) { return null; }
-    $title_pre = preg_replace('/\s+/', ' ', $title_matches[1]);
-    $title_pre = trim($title_pre);
-    $title_clean = explode('|',$title_pre);
-    $count = count($title_clean);
-    if ($count == 1) {
-      $title = $title_clean[0];
-    } else {
-      $new_url = explode('http://www.', trim($url));
-      $url_check = substr($new_url[1], 0, -4);
-      if ($url_check == strtolower(trim($title_clean[0]))) {
-        $title = $title_clean[0];
-      } elseif ($url_check == strtolower(trim($title_clean[1]))){
-        $title = $title_clean[1];
-      } else {
-        $title = ucfirst($url_check);
-      }
+  // Is not a bad page
+  if ($info['http_code']) {
+    // Check Drupal.
+    $drupal = _total_domination_check_drupal($url, $check);
+    if ($drupal) {
+      list($title, $cms) = $drupal;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
     }
-    $count = strlen($title);
-    if ($count > 200) {
-      $title = substr($title, 0, 200);
+    // Check Ektron
+    $ektron = _total_domination_check_ektron($url, $check);
+    if ($ektron) {
+      list($title, $cms) = $ektron;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
     }
-
-
-    $xh=curl_init();
-    curl_setopt($xh, CURLOPT_URL,$url . '/CHANGELOG.txt');
-    curl_setopt($xh, CURLOPT_CONNECTTIMEOUT, 2);
-    curl_setopt($xh, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($xh, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($xh, CURLOPT_BINARYTRANSFER, true);
-    curl_setopt($xh, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($xh, CURLOPT_TIMEOUT_MS, 10000);
-    curl_setopt($xh, CURLOPT_USERAGENT, $agent);
-    $version = curl_exec($xh);
-    curl_close($xh);
-    $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
-    $ver_get = substr(trim($ver_get), -4);
-
-    // get version #, tried a few different cases (like switch) but this worked the best
-    if (substr(trim($ver_get), -1) == ',') {
-      $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
-      $ver_get = substr(trim($ver_get), -5, -1);
-      $ver_get = 'Drupal ' . substr(trim($ver_get), 0, 1) . ' Site';
-    } elseif (substr(trim($ver_get), 0, 1) != '7') {
-      if (substr(trim($ver_get), 0, 1) != '6') {
-        if (substr(trim($ver_get), 0, 1) != '5') {
-          if (substr(trim($ver_get), 0, 1) != '8') {
-            if (substr(trim($ver_get), 0, 1) != '4') {
-              $ver_get = 'Drupal 7 Site'; //Unkown who cares.
-            }
-          }
-        }
-      }
-    } else {
-      $ver_get = 'Drupal ' . substr(trim($ver_get), 0, 1) . ' Site';
-    }
-
-    $node = new stdClass();
-    $node->type = 'winning';
-    node_object_prepare($node);
-    $node->title    = $title;
-    $node->language = LANGUAGE_NONE;
-    $node->field_drupal_version[$node->language][0]['value'] = $ver_get;
-    $node->field_drupal_version[$node->language][0]['safe_value'] = $ver_get;
-    $node->field_url[$node->language][0]['url'] =  check_plain($url);
-    $node->field_url[$node->language][0]['title'] =  check_plain($url);
-    $node->field_url[$node->language][0]['display_url'] =  check_plain($url);
-    $node->field_exported[$node->language][0]['value'] =  0;
-    node_save($node);
-
-    $context['results'][] = $node;
-    //$context['results'][] = check_plain($url) . $drupal;
   }
-
-  else if (strpos($check, 'EktronClientManager') !== false) {
-    $title_check = preg_match("/<title>(.*)<\/title>/siU", $check, $title_matches);
-    if (!$title_check) { return null; }
-    $title_pre = preg_replace('/\s+/', ' ', $title_matches[1]);
-    $title_pre = trim($title_pre);
-    $title_clean = explode('|',$title_pre);
-    $count = count($title_clean);
-    if ($count == 1) {
-      $title = $title_clean[0];
-    } else {
-      $new_url = explode('http://www.', trim($url));
-      $url_check = substr($new_url[1], 0, -4);
-      if ($url_check == strtolower(trim($title_clean[0]))) {
-        $title = $title_clean[0];
-      } elseif ($url_check == strtolower(trim($title_clean[1]))){
-        $title = $title_clean[1];
-      } else {
-        $title = ucfirst($url_check);
-      }
-    }
-    $count = strlen($title);
-    if ($count > 200) {
-      $title = substr($title, 0, 200);
-    }
-
-    $node = new stdClass();
-    $node->type = 'winning';
-    node_object_prepare($node);
-    $node->title    = $title;
-    $node->language = LANGUAGE_NONE;
-    $node->field_drupal_version[$node->language][0]['value'] = 'Ektron';
-    $node->field_drupal_version[$node->language][0]['safe_value'] = 'Ektron';
-    $node->field_url[$node->language][0]['url'] =  check_plain($url);
-    $node->field_url[$node->language][0]['title'] =  check_plain($url);
-    $node->field_url[$node->language][0]['display_url'] =  check_plain($url);
-    $node->field_exported[$node->language][0]['value'] =  0;
-    node_save($node);
-    $context['results'][] = $node;
-  }
-  else {
-    //watchdog('WTF', 'WTF - ' . $info['http_code']);
-  }
-
 
   $context['message'] = t('Now assimilating %url', array('%url' => $url));
 }
@@ -383,5 +139,191 @@ function total_domination_mail($key, &$message, $params) {
       $output .= 'You have new leads to check out at http://assimilate.kalamuna.com';
       $message['body'][] = $output;
     break;
+  }
+}
+
+/**
+ * Curl function for all magix happen.
+ *
+ * @param string $url
+ *   The url in question
+ *
+ * @return object $return
+ *   curl response + info
+ */
+function _total_domination_curl($url) {
+  // Many tries and headaches but this curl gets em all
+  $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL,$url);
+  curl_setopt($ch, CURLOPT_ENCODING,  '');
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10000);
+  curl_setopt($ch, CURLOPT_USERAGENT, $agent);
+  $check = curl_exec($ch);
+  $info = curl_getinfo($ch);
+  curl_close($ch);
+
+  $result = array($check, $info);
+  return $result;
+}
+
+/**
+ * Get the title.
+ *
+ * @param string $url
+ *   The url in question
+ *
+ * @param string $check
+ *   curl response
+ *
+ * @return string $title
+ *   formatted title string
+ */
+function _total_domination_check_title($url, $check) {
+  $title_check = preg_match("/<title>(.*)<\/title>/siU", $check, $title_matches);
+  // Error handling:
+  if (!$title_check) { return null; }
+  $title_pre = preg_replace('/\s+/', ' ', $title_matches[1]);
+  $title_pre = trim($title_pre);
+  $title_clean = explode('|',$title_pre);
+  $count = count($title_clean);
+  if ($count == 1) {
+    $title = $title_clean[0];
+  } else {
+    // Match up title to preg_match.
+    if (strpos(trim($url), 'http://www.') !== false) {
+      $new_url = explode('http://www.', $url);
+    }
+    elseif (strpos(trim($url), 'https://www.') !== false) {
+      $new_url = explode('https://www.', $url);
+    }
+    elseif (strpos(trim($url), 'http://') !== false) {
+      $new_url = explode('http://', $url);
+    }
+    elseif (strpos(trim($url), 'https://') !== false) {
+      $new_url = explode('https://', $url);
+    }
+    else {
+      $new_url = $url;
+    }
+    // Check and set the title.
+    $url_check = isset($new_url[1]) ? substr($new_url[1], 0, -4) : substr($new_url, 0, -4) ;
+    if ($url_check == strtolower(trim($title_clean[0]))) {
+      $title = $title_clean[0];
+    } elseif ($url_check == strtolower(trim($title_clean[1]))){
+      $title = $title_clean[1];
+    } else {
+      $title = ucfirst($url_check);
+    }
+  }
+  // Fix large titles.
+  $count = strlen($title);
+  if ($count > 200) {
+    $title = substr($title, 0, 200);
+  }
+
+  return $title;
+}
+
+/**
+ * Creates the node.
+ */
+function _total_domination_node_create($title, $cms, $url) {
+  $node = new stdClass();
+  $node->type = 'winning';
+  node_object_prepare($node);
+  $node->title    = $title;
+  $node->language = LANGUAGE_NONE;
+  $node->field_drupal_version[$node->language][0]['value'] = $cms;
+  $node->field_drupal_version[$node->language][0]['safe_value'] = $cms;
+  $node->field_url[$node->language][0]['url'] =  check_plain($url);
+  $node->field_url[$node->language][0]['title'] =  check_plain($url);
+  $node->field_url[$node->language][0]['display_url'] =  check_plain($url);
+  $node->field_exported[$node->language][0]['value'] =  0;
+  node_save($node);
+}
+
+/**
+ * Check for Drupal.
+ *
+ * @param string $url
+ *   The url in question
+ *
+ * @param string $check
+ *   curl response
+ *
+ * @return object $result
+ *    the title and version OR return FALSE if not drupal.
+ */
+function _total_domination_check_drupal($url, $check) {
+  // Check for up to Drupal 7.
+  if (strpos($check, 'not-logged-in') !== false) {
+    // Set the title.
+    $title = _total_domination_check_title($url, $check);
+    // Check CHANGELOG for versions.
+    $versions = _total_domination_curl($url . '/CHANGELOG.txt');
+    list($version, $info) = $versions;
+    // If page is there.
+    if ($info['http_code'] == 200) {
+      $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
+      $ver_get = substr(trim($ver_get), -4);
+
+      // get version #.
+      if (substr(trim($ver_get), -1) == ',') {
+        $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
+        $ver_get = substr(trim($ver_get), -5, -1);
+        $ver_get = 'Drupal ' . substr(trim($ver_get), 0, 1) . ' Site';
+      }
+      else {
+        $ver = substr(trim($ver_get), 0, 1);
+        $ver_check = array('4','5','6','7','8');
+        if (in_array($ver, $ver_check)) {
+          $ver_get = 'Drupal ' . $ver . ' Site';
+        }
+        else {
+          $ver_get = 'Drupal 7 Site'; //Unknown who cares.
+        }
+      }
+    }
+    else {
+      $ver_get = 'Drupal 7 Site'; //Unkown 403, whatevz.
+    }
+    // Package it all up.
+    $result = array($title, $ver_get);
+    return $result;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+
+/**
+ * Check for Ektron.
+ *
+ * @param string $url
+ *   The url in question
+ *
+ * @param string $check
+ *   curl response
+ *
+ * @return object $result
+ *    the title and version OR return FALSE if not Ektron.
+ */
+function _total_domination_check_ektron($url, $check) {
+  if (strpos($check, 'EktronClientManager') !== false) {
+    $title = _total_domination_check_title($url, $check);
+
+    // Package it all up.
+    $result = array($title, 'Ektron');
+    return $result;
+  }
+  else {
+    return FALSE;
   }
 }
