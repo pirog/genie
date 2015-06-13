@@ -1,0 +1,70 @@
+<?php
+/**
+ * @file
+ * Code for the Total Domination feature.
+ */
+
+include_once 'total_domination.features.inc';
+
+/*
+ * Implements hook_ctools_plugin_directory()
+ */
+function total_domination_ctools_plugin_directory($owner, $plugin_type) {
+  // we'll be nice and limit scandir() calls
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/content_types';
+  }
+}
+
+/**
+ * Implements hook_node_export_node_alter()
+ */
+function total_domination_node_export_node_alter(&$node, $original_node) {
+  if ($node->field_exported[$node->language][0]['value'] == 0) {
+    $node->field_exported[$node->language][0]['value'] =  1;
+    node_save($node);
+  }
+}
+
+/**
+ * Implements hook_form_alter()
+ */
+function total_domination_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'views_form_winning_panel_pane') !== FALSE) {
+    $modes = array('dsv', 'json', 'xml');
+    // Hide operations if empty
+    if ($form['#prefix'] != '<div class="vbo-views-form">') {
+      foreach ($modes as $mode) {
+        unset($form['select']['action::node_export_' . $mode . '_action']);
+      }
+    }
+    // Add submit function to refresh the page after a submission
+    foreach ($modes as $mode) {
+      $form['select']['action::node_export_' . $mode . '_action']['#submit'][] = 'total_domination_node_export_submit';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_html()
+ */
+function total_domination_preprocess_html(&$variables) {
+  drupal_add_css(drupal_get_path('module', 'total_domination') . "/css/total_domination.css");
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter()
+ */
+function total_domination_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+  // Remove destination parameter so that the login block respects the settings
+  // in Panopoly Users
+  $form['#action'] = url(current_path());
+}
+
+/*
+ * Node export submit function
+ */
+function total_domination_node_export_submit($form, &$form_state) {
+  //this doesnt seem to work but will keep it around
+  // WE CANT REMOVE THIS UE TO FATAL ERRORS HAPPENING.
+}

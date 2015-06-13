@@ -1,0 +1,15 @@
+<?php
+/**
+ * @file
+ * Code for the Total Domination feature.
+ */
+
+/**
+ * Update system weight
+ */
+function total_domination_update_7100() {
+  db_update('system')
+    ->fields(array('weight' => 1000))
+    ->condition('name', 'total_domination', '=')
+    ->execute();
+}

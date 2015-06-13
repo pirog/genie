@@ -1,0 +1,53 @@
+.pane-user-login .item-list {
+  display: none;
+}
+
+.pane-user-login {
+  margin-left: 60px;
+}
+
+.pane-total-logo  {
+  height: 250px;
+  overflow: hidden;
+  margin: 0;
+  text-align: center;
+}
+
+#edit-urls {
+  height: 460px;
+}
+
+.btn-primary a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.btn-default a {
+  color: #333;
+  text-decoration: none;
+}
+
+#edit-pass {
+  width: 240px;
+}
+
+#edit-name {
+  width: 240px;
+}
+
+#edit-submit {
+  width: 240px;
+}
+
+.form-item.form-type-select.form-item-operation {
+  display: inline-block;
+}
+
+#edit-actionnode-export-dsv-action, #edit-actionnode-export-xml-action, #edit-actionnode-export-json-action  {
+  margin-bottom: 10px;
+}
+
+.view-id-winning #edit-select legend {
+  display: none;
+}
+
