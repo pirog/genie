@@ -46,6 +46,7 @@ function total_clean_form($form, &$form_state) {
     '#title' => t('Choose your poison:'),
     '#options' => array(
       '00' => t(' -- Must SELECT --'),
+      'cache' => t('Cleanse Caches'),
       'batch' => t('Clean Batch Table'),
       'nodes' => t('Clean Nodes Older Than 1 Month'),
     ),
@@ -80,6 +81,10 @@ function total_clean_form_submit($form, &$form_state) {
   $operations = array();
   $what = $form_state['values']['whatwedoin'];
   switch ($what) {
+    case 'cache':
+      _total_clean_caches();
+      break;
+
     case 'batch':
       _total_clean_batch_cleanse();
       break;
@@ -91,6 +96,21 @@ function total_clean_form_submit($form, &$form_state) {
 
 }
 
+function _total_clean_caches() {
+  // This way we know all the caches are really being cleaned.
+  // Grab all the tables.
+  $caches = db_query('SHOW TABLES')->fetchAll();
+  foreach ($caches as $cache) {
+    $tables[] = $cache->Tables_in_kalabox;
+  }
+  // Flatten and search for cache then dominate.
+  foreach ($tables as $clean) {
+    if (strpos($clean, 'cache') !== false) {
+      db_truncate($clean)->execute();
+    }
+  }
+  drupal_set_message(t('ALL CACHE Tables hasth been cleansed of evil, WE WIN'), 'status', FALSE);
+}
 
 function _total_clean_batch_cleanse() {
   // See if any rowz to cleanse.
