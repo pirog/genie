@@ -96,6 +96,9 @@ function total_clean_form_submit($form, &$form_state) {
 
 }
 
+/**
+ * Custom cache cleanse function.
+ */
 function _total_clean_caches() {
   // This way we know all the caches are really being cleaned.
   // Grab all the tables.
@@ -112,6 +115,9 @@ function _total_clean_caches() {
   drupal_set_message(t('ALL CACHE Tables hasth been cleansed of evil, WE WIN'), 'status', FALSE);
 }
 
+/**
+ * 86 the BATCH table.
+ */
 function _total_clean_batch_cleanse() {
   // See if any rowz to cleanse.
   $row = db_query('SELECT * FROM batch')->rowCount();
@@ -125,6 +131,9 @@ function _total_clean_batch_cleanse() {
   }
 }
 
+/**
+ * Cleanse the old nodez.
+ */
 function _total_clean_old_nodes() {
   $months = strtotime('-1 month');
   $nodez = db_query('SELECT nid from node WHERE created < :months', array(':months' => $months))->fetchAll();
