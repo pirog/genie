@@ -104,7 +104,12 @@ function _total_clean_caches() {
   // Grab all the tables.
   $caches = db_query('SHOW TABLES')->fetchAll();
   foreach ($caches as $cache) {
-    $tables[] = $cache->Tables_in_kalabox;
+    if (isset($cache->Tables_in_kalabox)) {
+      $tables[] = $cache->Tables_in_kalabox;
+    }
+    else {
+      $tables[] = $cache->Tables_in_drupal;
+    }
   }
   // Flatten and search for cache then dominate.
   foreach ($tables as $clean) {
