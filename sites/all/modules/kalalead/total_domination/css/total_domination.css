@@ -14,7 +14,8 @@
 }
 
 #edit-urls {
-  height: 460px;
+  height: 225px;
+  max-height: 225px;
 }
 
 .btn-primary a {

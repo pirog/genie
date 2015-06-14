@@ -65,7 +65,6 @@ function total_domination_form_of_doom_form($form, &$form_state) {
   $form['urls'] = array(
     '#type' => 'textarea',
     '#title' => t('URLS TO ASSIMILATE'),
-    '#size' => 10,
     '#states' => array(
       'required' => array(':input[name="upload"]' =>  array('checked' => FALSE)),
       'visible' => array(':input[name="upload"]' =>  array('checked' => FALSE)),
@@ -88,6 +87,27 @@ function total_domination_form_of_doom_form($form, &$form_state) {
   );
 
   return $form;
+}
+
+/**
+ * Validate the form of doom
+ */
+function total_domination_form_of_doom_form_validate($form, &$form_state) {
+  $test = '1';
+  // Required doesnt work well with states it seemz.
+  if (!$form['upload']['#checked'] && empty($form_state['values']['urls'])) {
+    form_set_error('urls', 'You can\'t leave this blank, sup with DAT?');
+  }
+  elseif ($form['upload']['#checked']) {
+    $file = file_save_upload('uploadz');
+    if (!isset($file)) {
+      form_set_error('uploadz', 'Where\'s your file at FOOL?');
+    }
+    else {
+      $validators = array('file_validate_extensions' => array('txt'));
+      $file = file_save_upload('uploadz', $validators);
+    }
+  }
 }
 
 /**
@@ -133,8 +153,7 @@ function total_domination_form_of_doom_form_submit($form, &$form_state) {
 function _total_domination_process_urls($form, $form_state) {
   // If a File
   if (empty($form_state['values']['urls'])) {
-    $validators = array('file_validate_extensions' => array('txt'));
-    $file = file_save_upload('uploadz', $validators);
+    $file = file_save_upload('uploadz');
     $uri = $file->uri;
     $fhandle = fopen($uri, 'r');
     $urlzzz = fread($fhandle, filesize($uri));
