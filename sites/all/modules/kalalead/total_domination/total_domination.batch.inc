@@ -362,7 +362,7 @@ function _total_domination_check_ektron($url, $check) {
 }
 
 /**
- * Check for Ektron.
+ * Check for WordPress.
  *
  * @param string $url
  *   The url in question
