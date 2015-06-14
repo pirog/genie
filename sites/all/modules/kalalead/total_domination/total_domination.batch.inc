@@ -57,6 +57,32 @@ function total_domination_ektron_batch($url, &$context) {
 }
 
 /*
+ * Batch check for WordPress function.
+ */
+function total_domination_wp_batch($url, &$context) {
+  // Update our progress information.
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['progress'] = 0;
+  }
+  $context['sandbox']['progress']++;
+
+  $checks = _total_domination_curl($url);
+  list($check, $info) = $checks;
+
+  // Is not a bad page
+  if ($info['http_code']) {
+    $wp = _total_domination_check_wp($url, $check);
+    if ($wp) {
+      list($title, $cms) = $wp;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
+    }
+  }
+
+  $context['message'] = t('Now assimilating %url', array('%url' => $url));
+}
+
+/*
  * Batch for ALL CMS function.
  */
 function total_domination_all_batch($url, &$context) {
@@ -82,6 +108,13 @@ function total_domination_all_batch($url, &$context) {
     $ektron = _total_domination_check_ektron($url, $check);
     if ($ektron) {
       list($title, $cms) = $ektron;
+      _total_domination_node_create($title, $cms, $url);
+      $context['results'][] = $url;
+    }
+    // Check WordPress
+    $wp = _total_domination_check_wp($url, $check);
+    if ($wp) {
+      list($title, $cms) = $wp;
       _total_domination_node_create($title, $cms, $url);
       $context['results'][] = $url;
     }
@@ -321,6 +354,31 @@ function _total_domination_check_ektron($url, $check) {
 
     // Package it all up.
     $result = array($title, 'Ektron');
+    return $result;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Check for Ektron.
+ *
+ * @param string $url
+ *   The url in question
+ *
+ * @param string $check
+ *   curl response
+ *
+ * @return object $result
+ *    the title and version OR return FALSE if not WordPress.
+ */
+function _total_domination_check_wp($url, $check) {
+  if (strpos($check, 'wp-content') !== false) {
+    $title = _total_domination_check_title($url, $check);
+
+    // Package it all up.
+    $result = array($title, 'Wordpress Site');
     return $result;
   }
   else {

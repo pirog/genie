@@ -53,6 +53,7 @@ function total_domination_form_of_doom_form($form, &$form_state) {
       'all' => t('ALL CMS'),
       'drupal' => t('Drupal Only'),
       'ektron' => t('Ektron Only'),
+      'wp' => t('Wordpress Only'),
     ),
     '#default_value' => 0,
     '#required' => TRUE,
@@ -121,8 +122,10 @@ function total_domination_form_of_doom_form_submit($form, &$form_state) {
       }
       break;
 
-    default:
-      # code...
+    case 'wp':
+      foreach ($form_state['values']['urls'] as $url) {
+        $operations[] = array('total_domination_wp_batch', array($url));
+      }
       break;
   }
 
