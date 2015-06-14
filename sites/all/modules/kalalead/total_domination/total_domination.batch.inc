@@ -4,88 +4,11 @@
  * Batch function
  */
 
-/*
- * Batch check for Drupal function.
- */
-function total_domination_drupal_batch($url, &$context) {
-  // Update our progress information.
-  if (!isset($context['sandbox']['progress'])) {
-    $context['sandbox']['progress'] = 0;
-  }
-  $context['sandbox']['progress']++;
-
-  $checks = _total_domination_curl($url);
-  list($check, $info) = $checks;
-
-  // Is not a bad page
-  if ($info['http_code']) {
-    $drupal = _total_domination_check_drupal($url, $check);
-    if ($drupal) {
-      list($title, $cms) = $drupal;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
-    }
-  }
-
-  $context['message'] = t('Now assimilating %url', array('%url' => $url));
-}
-
-/*
- * Batch check for Ektron function.
- */
-function total_domination_ektron_batch($url, &$context) {
-  // Update our progress information.
-  if (!isset($context['sandbox']['progress'])) {
-    $context['sandbox']['progress'] = 0;
-  }
-  $context['sandbox']['progress']++;
-
-  $checks = _total_domination_curl($url);
-  list($check, $info) = $checks;
-
-  // Is not a bad page
-  if ($info['http_code']) {
-    $ektron = _total_domination_check_ektron($url, $check);
-    if ($ektron) {
-      list($title, $cms) = $ektron;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
-    }
-  }
-
-  $context['message'] = t('Now assimilating %url', array('%url' => $url));
-}
-
-/*
- * Batch check for WordPress function.
- */
-function total_domination_wp_batch($url, &$context) {
-  // Update our progress information.
-  if (!isset($context['sandbox']['progress'])) {
-    $context['sandbox']['progress'] = 0;
-  }
-  $context['sandbox']['progress']++;
-
-  $checks = _total_domination_curl($url);
-  list($check, $info) = $checks;
-
-  // Is not a bad page
-  if ($info['http_code']) {
-    $wp = _total_domination_check_wp($url, $check);
-    if ($wp) {
-      list($title, $cms) = $wp;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
-    }
-  }
-
-  $context['message'] = t('Now assimilating %url', array('%url' => $url));
-}
 
 /*
  * Batch for ALL CMS function.
  */
-function total_domination_all_batch($url, &$context) {
+function total_domination_cms_batch($url, $cms, &$context) {
   // Update our progress information.
   if (!isset($context['sandbox']['progress'])) {
     $context['sandbox']['progress'] = 0;
@@ -97,26 +20,34 @@ function total_domination_all_batch($url, &$context) {
 
   // Is not a bad page
   if ($info['http_code']) {
-    // Check Drupal.
-    $drupal = _total_domination_check_drupal($url, $check);
-    if ($drupal) {
-      list($title, $cms) = $drupal;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
-    }
-    // Check Ektron
-    $ektron = _total_domination_check_ektron($url, $check);
-    if ($ektron) {
-      list($title, $cms) = $ektron;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
-    }
-    // Check WordPress
-    $wp = _total_domination_check_wp($url, $check);
-    if ($wp) {
-      list($title, $cms) = $wp;
-      _total_domination_node_create($title, $cms, $url);
-      $context['results'][] = $url;
+    foreach ($cms as $project) {
+      if ($project == 'drupal') {
+        // Check Drupal.
+        $drupal = _total_domination_check_drupal($url, $check);
+        if ($drupal) {
+          list($title, $cms_result) = $drupal;
+          _total_domination_node_create($title, $cms_result, $url);
+          $context['results'][] = $url;
+        }
+      }
+      elseif ($project == 'ektron') {
+        // Check Ektron
+        $ektron = _total_domination_check_ektron($url, $check);
+        if ($ektron) {
+          list($title, $cms_result) = $ektron;
+          _total_domination_node_create($title, $cms_result, $url);
+          $context['results'][] = $url;
+        }
+      }
+      elseif ($project == 'wp') {
+        // Check WordPress
+        $wp = _total_domination_check_wp($url, $check);
+        if ($wp) {
+          list($title, $cms_result) = $wp;
+          _total_domination_node_create($title, $cms_result, $url);
+          $context['results'][] = $url;
+        }
+      }
     }
   }
 

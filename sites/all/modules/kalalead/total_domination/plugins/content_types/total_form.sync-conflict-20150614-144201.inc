@@ -46,14 +46,16 @@ function total_domination_form_of_doom_form($form, &$form_state) {
   );
 
   $form['cms'] = array(
-    '#type' => 'checkboxes',
+    '#type' => 'select',
     '#title' => t('What type of droids are we searching for?'),
     '#options' => array(
-      'drupal' => t('Drupal'),
-      'ektron' => t('Ektron'),
-      'wp' => t('Wordpress'),
+      '00' => t(' -- Must SELECT --'),
+      'all' => t('ALL CMS'),
+      'drupal' => t('Drupal Only'),
+      'ektron' => t('Ektron Only'),
+      'wp' => t('Wordpress Only'),
     ),
-    '#default_value' => array('drupal','ektron','wp'),
+    '#default_value' => 0,
     '#required' => TRUE,
   );
 
@@ -74,7 +76,7 @@ function total_domination_form_of_doom_form($form, &$form_state) {
 
   $form['uploadz'] = array(
     '#type' => 'file',
-    '#title' => t('FILE TO DOMINATE'),
+    '#title' => t('Use a File Instead'),
     '#description' => t('Upload a file, allowed extensions: txt'),
     '#states' => array(
       'required' => array(':input[name="upload"]' =>  array('checked' => TRUE)),
@@ -91,33 +93,54 @@ function total_domination_form_of_doom_form($form, &$form_state) {
 }
 
 /**
+ * Validate the form of doom
+ */
+function total_domination_form_of_doom_form_validate($form, &$form_state) {
+  // Make sure the defualt options isnt chosen.
+  if ($form_state['values']['cms'] == '00') {
+    form_set_error('cms', 'You must select a DROID');
+  }
+}
+
+/**
  * Submit the form of doom
  */
 function total_domination_form_of_doom_form_submit($form, &$form_state) {
   $operations = array();
   $urls = _total_domination_process_urls($form, $form_state);
-  $cms_check = $form_state['values']['cms'];
+  $cms = $form_state['values']['cms'];
+  switch ($cms) {
+    case 'all':
+      foreach ($urls as $url) {
+        $operations[] = array('total_domination_all_batch', array($url));
+      }
+      break;
 
-  // Remove empty checkboxes as it is causing oddness in the batch.
-  foreach ($cms_check as $project) {
-    if ($project) {
-      $cms[] = $project;
-    }
+    case 'drupal':
+      foreach ($urls as $url) {
+        $operations[] = array('total_domination_drupal_batch', array($url));
+      }
+      break;
+
+    case 'ektron':
+      foreach ($urls as $url) {
+        $operations[] = array('total_domination_ektron_batch', array($url));
+      }
+      break;
+
+    case 'wp':
+      foreach ($urls as $url) {
+        $operations[] = array('total_domination_wp_batch', array($url));
+      }
+      break;
   }
 
-  // Set the operations through batch magix.
-  foreach ($urls as $url) {
-    $operations[] = array('total_domination_cms_batch', array($url, $cms));
-  }
-
-  // Engage.
   $batch = array(
     'title' => t('Assimilating...'),
     'operations' => $operations,
     'finished' => 'total_domination_batch_finished',
     'file' => drupal_get_path('module', 'total_domination') . '/total_domination.batch.inc',
   );
-
   batch_set($batch);
 }
 
