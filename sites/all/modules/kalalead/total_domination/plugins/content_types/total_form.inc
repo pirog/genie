@@ -153,20 +153,35 @@ function total_domination_form_of_doom_form_submit($form, &$form_state) {
 function _total_domination_process_urls($form, $form_state) {
   // If a File
   if (empty($form_state['values']['urls'])) {
+    // Get the file.
     $file = file_save_upload('uploadz');
     $uri = $file->uri;
-    $fhandle = fopen($uri, 'r');
-    $urlzzz = fread($fhandle, filesize($uri));
-    fclose($fhandle);
+    $handle = fopen($uri, 'r');
+    // Better file handling for large filez.
+    if ($handle) {
+      while (($line = fgets($handle)) !== false) {
+        // This is removing all the odd shizzy thay the file is spitting back
+        $line_fix = utf8_decode($line);
+        $line_fix = str_replace("\0", "", $line_fix);
+        $line_fix = str_replace("??", "", $line_fix);
+        $line_fix = preg_replace('/\s+/', '', $line_fix);
+        $urls[] = $line_fix;
+      }
+      fclose($handle);
+      // Clean up temp files.
+      file_delete($file);
+      file_unmanaged_delete($uri);
+    } else {
+      drupal_set_message(t('Could not open file!'), 'error', FALSE);
+    }
   }
   // If the text box
   else {
-    $urlzzz = $form_state['values']['urls'];
+    $urls = preg_split("/\r\n|\n|\r/", $form_state['values']['urls']);
   }
 
   // Put the URLs into an array and try to get them in the best
   // format possible for domination
-  $urls = preg_split("/\r\n|\n|\r/", $urlzzz);
   $parsed_urls = array();
   foreach ($urls as $url) {
     $parsed_url = parse_url($url);
