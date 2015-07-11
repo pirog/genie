@@ -1,3 +1,13 @@
+Panopoly Test 7.x-1.25, 2015-07-08
+---------------------------
+- Add phing-based build system to make it easier for contributors to build,
+  install and run tests.
+- Allow video_widget.feature to run under Firefox.
+
+Panopoly Test 7.x-1.24, 2015-07-02
+---------------------------
+- No changes since last release.
+
 Panopoly Test 7.x-1.23, 2015-06-17
 ---------------------------
 - Commit composer.lock to increase test performance and consistancy.
