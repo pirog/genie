@@ -312,7 +312,7 @@ function _batch_process() {
     $queue = _batch_queue($current_set);
 
     // If we are in progressive mode, break processing after 1 second.
-    if ($batch['progressive'] && timer_read('batch_processing') > 1000) {
+    if ($batch['progressive'] && timer_read('batch_processing') > 30000) {
       // Record elapsed wall clock time.
       $current_set['elapsed'] = round((microtime(TRUE) - $current_set['start']) * 1000, 2);
       break;
