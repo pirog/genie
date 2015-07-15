@@ -27,6 +27,26 @@ function total_domination_menu_default_menu_links() {
     'weight' => -50,
     'customized' => 1,
   );
+  // Exported menu link: main-menu_cleanse-me:admin/kalalead/clean
+  $menu_links['main-menu_cleanse-me:admin/kalalead/clean'] = array(
+    'menu_name' => 'main-menu',
+    'link_path' => 'admin/kalalead/clean',
+    'router_path' => 'admin/kalalead/clean',
+    'link_title' => 'Cleanse Me',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+      'identifier' => 'main-menu_cleanse-me:admin/kalalead/clean',
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -48,
+    'customized' => 1,
+  );
   // Exported menu link: main-menu_leads-won:admin/kalalead/lead/won
   $menu_links['main-menu_leads-won:admin/kalalead/lead/won'] = array(
     'menu_name' => 'main-menu',
@@ -41,7 +61,7 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -48,
+    'weight' => -46,
     'customized' => 1,
   );
   // Exported menu link: main-menu_logout:user/logout
@@ -61,7 +81,44 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -47,
+    'weight' => -44,
+    'customized' => 1,
+  );
+  // Exported menu link: main-menu_macro-cleanup:admin/kalalead/macro
+  $menu_links['main-menu_macro-cleanup:admin/kalalead/macro'] = array(
+    'menu_name' => 'main-menu',
+    'link_path' => 'admin/kalalead/macro',
+    'router_path' => 'admin/kalalead/macro',
+    'link_title' => 'Macro Cleanup',
+    'options' => array(
+      'identifier' => 'main-menu_macro-cleanup:admin/kalalead/macro',
+    ),
+    'module' => 'system',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -49,
+    'customized' => 1,
+  );
+  // Exported menu link: main-menu_my-account:user
+  $menu_links['main-menu_my-account:user'] = array(
+    'menu_name' => 'main-menu',
+    'link_path' => 'user',
+    'router_path' => 'user',
+    'link_title' => 'My Account',
+    'options' => array(
+      'attributes' => array(
+        'title' => '',
+      ),
+      'identifier' => 'main-menu_my-account:user',
+    ),
+    'module' => 'menu',
+    'hidden' => 0,
+    'external' => 0,
+    'has_children' => 0,
+    'expanded' => 0,
+    'weight' => -45,
     'customized' => 1,
   );
   // Exported menu link: main-menu_new-leads:admin/kalalead/lead/new
@@ -78,16 +135,19 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -49,
+    'weight' => -47,
     'customized' => 1,
   );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Assimilate More');
+  t('Cleanse Me');
   t('Leads Won');
   t('Logout');
+  t('Macro Cleanup');
+  t('My Account');
   t('New Leads');
-
 
   return $menu_links;
 }

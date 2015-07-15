@@ -1,1 +1,5 @@
-# Allow all, bla ha ha ha ha
+# Allow almost all
+.stfolder
+.stignore
+/sites/*/files/*.txt
+/sites/*/files/*.csv
