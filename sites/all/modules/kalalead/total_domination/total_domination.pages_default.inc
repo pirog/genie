@@ -830,7 +830,7 @@ function total_domination_default_page_manager_pages() {
   $handler->conf = array(
     'title' => 'Form of Macro',
     'no_blocks' => 0,
-    'pipeline' => 'ipe',
+    'pipeline' => 'standard',
     'body_classes_to_remove' => '',
     'body_classes_to_add' => '',
     'css_id' => '',

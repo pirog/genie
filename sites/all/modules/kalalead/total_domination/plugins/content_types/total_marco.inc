@@ -92,7 +92,6 @@ function total_macro_form_submit($form, &$form_state) {
     }
     fclose($handle);
     // Clean up temp files.
-    file_delete($file);
     file_unmanaged_delete($uri);
 
     foreach ($lines as $line) {

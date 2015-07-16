@@ -14,12 +14,15 @@ function total_domination_macro_batch($line, &$context) {
   }
   $context['sandbox']['progress']++;
 
-  // Get all domain suffixes below:
-  $suffixes = _total_domination_macro_domains();
-  foreach ($suffixes as $suffix) {
-    if (strpos($line, $suffix) !== false) {
-      $url = 'http://' . trim($line);
-      $context['results'][] = $url;
+  // If there is a period, then check if it is a domain.
+  if (strpos($line, '.') !== false) {
+    // Get all domain suffixes below:
+    $suffixes = _total_domination_macro_domains();
+    foreach ($suffixes as $suffix) {
+      if (strpos($line, $suffix) !== false) {
+        $url = 'http://' . trim($line);
+        $context['results'][] = $url;
+      }
     }
   }
   $context['message'] = t('Now winning %line', array('%line' => $line));
@@ -74,8 +77,7 @@ function _total_domination_save_csv($results) {
     'Content-disposition' => 'attachment; filename='. $textfile_name,
     'Content-Type' => 'text/plain; utf-8',
   ));
-
-  drupal_goto('admin/kalalead/macro');
+  // One day figure out how to redirct after file transfer.
 }
 
 /**
