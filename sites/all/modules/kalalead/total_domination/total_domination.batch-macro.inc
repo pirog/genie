@@ -14,16 +14,12 @@ function total_domination_macro_batch($line, &$context) {
   }
   $context['sandbox']['progress']++;
 
-  // If there is a period, then check if it is a domain.
-  if (strpos($line, '.') !== false) {
-    // Get all domain suffixes below:
-    $suffixes = _total_domination_macro_domains();
-    foreach ($suffixes as $suffix) {
-      if (strpos($line, $suffix) !== false) {
-        $url = 'http://' . trim($line);
-        $context['results'][] = $url;
-      }
-    }
+  $domains = variable_get('total_domination_macro_domains', NULL);
+
+  list($pos, $match) = _strposm_min2($line, $domains);
+  if ($pos != false) {
+    $url = 'http://' . trim($line);
+    $context['results'][] = $url;
   }
   $context['message'] = t('Now winning %line', array('%line' => $line));
 }
@@ -36,6 +32,7 @@ function total_domination_batch_macro_finished($success, $results, $operations) 
   // other error management should be handled using 'results'.
   $items = array();
   if ($success) {
+    variable_del('total_domination_macro_domains');
     _total_domination_save_csv($results);
     $message = format_plural(count($results), 'WIN.', '@count hasth been WON.');
   }
@@ -81,12 +78,16 @@ function _total_domination_save_csv($results) {
 }
 
 /**
- * List of domain suffixes from the interwebz
- *
- * @return object domain suffixes
+ * STRPOS for ARRAYS taken from:
+ * http://creativeandcritical.net/php-strposm-a-strpos-variant-that-accepts-an-array-of-needles
+ * @param  string  $haystack - content searching
+ * @param  object  $needles  - array you are looking at.
+ * @param  integer $offset   - offest if you want it
+ * @return see url for diff returns
  */
-function _total_domination_macro_domains() {
-  return array(
-'.ac','.ac.uk','.ad','.ae','.aero','.af','.ag','.ai','.al','.am','.an','.ao','.aq','.ar','.arpa','.as','.asia','.at','.au','.aw','.ax','.az','.ba','.bb','.bd','.be','.bf','.bg','.bh','.bi','.biz','.bj','.bm','.bn','.bo','.br','.bs','.bt','.bv','.bw','.by','.bz','.ca','.cat','.cc','.cd','.cf','.cg','.ch','.ci','.ck','.cl','.cm','.cn','.co','.co.uk','.com','.coop','.cr','.cs','.cu','.cv','.cx','.cy','.cz','.dd','.de','.dj','.dk','.dm','.do','.dz','.ec','.edu','.ee','.eg','.eh','.er','.es','.et','.eu','.fi','.firm','.fj','.fk','.fm','.fo','.fr','.fx','.ga','.gb','.gd','.ge','.gf','.gh','.gi','.gl','.gm','.gn','.gov','.gov.uk','.gp','.gq','.gr','.gs','.gt','.gu','.gw','.gy','.hk','.hm','.hn','.hr','.ht','.hu','.id','.ie','.il','.im','.in','.info','.int','.io','.iq','.ir','.is','.it','.je','.jm','.jo','.jobs','.jp','.ke','.kg','.kh','.ki','.km','.kn','.kp','.kr','.kw','.ky','.kz','.la','.lb','.lc','.li','.lk','.lr','.ls','.lt','.ltd.uk','.lu','.lv','.ly','.ma','.mc','.md','.me','.me.uk','.mg','.mh','.mil','.mk','.ml','.mm','.mn','.mo','.mobi','.mod.uk','.mp','.mq','.mr','.ms','.mt','.mu','.museum','.mv','.mw','.mx','.my','.mz','.na','.name','.nato','.nc','.ne','.net','.net.uk','.nf','.ng','.nhs.uk','.ni','.nl','.no','.nom','.np','.nr','.nt','.nu','.nz','.om','.org','.org.uk','.pa','.pe','.pf','.pg','.ph','.pk','.pl','.plc.uk','.pm','.pn','.post','.pr','.pro','.ps','.pt','.pw','.py','.qa','.re','.ro','.rs','.ru','.rw','.sa','.sb','.sc','.sch.uk','.sd','.se','.sg','.sh','.si','.sj','.sk','.sl','.sm','.sn','.so','.sr','.ss','.st','.store','.su','.sv','.sy','.sz','.tc','.td','.tel','.tf','.tg','.th','.tj','.tk','.tl','.tm','.tn','.to','.tp','.tr','.travel','.tt','.tv','.tw','.tz','.ua','.ug','.uk','.um','.us','.uy','.va','.vc','.ve','.vg','.vi','.vn','.vu','.web','.wf','.ws','.xxx','.ye','.yt','.yu','.za','.zm','.zr','.zw',
-  );
+function _strposm_min2($haystack, $needles, $offset = 0) {
+  $pattern = '('.implode('|', array_map('preg_quote', (array)$needles)).')';
+  return preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE, $offset)
+           ? array_reverse($matches[0])
+           : array(false, null);
 }
