@@ -16,11 +16,13 @@ function total_domination_macro_batch($line, &$context) {
 
   $domains = variable_get('total_domination_macro_domains', NULL);
 
-  list($pos, $match) = _strposm_min2($line, $domains);
-  if ($pos != false) {
-    $url = 'http://' . trim($line);
-    $context['results'][] = $url;
+  foreach ($domains as $domain) {
+    if (strpos($line, $domain) !== false) {
+      $url = 'http://' . trim($line);
+      $context['results'][] = $url;
+    }
   }
+
   $context['message'] = t('Now winning %line', array('%line' => $line));
 }
 
@@ -75,19 +77,4 @@ function _total_domination_save_csv($results) {
     'Content-Type' => 'text/plain; utf-8',
   ));
   // One day figure out how to redirct after file transfer.
-}
-
-/**
- * STRPOS for ARRAYS taken from:
- * http://creativeandcritical.net/php-strposm-a-strpos-variant-that-accepts-an-array-of-needles
- * @param  string  $haystack - content searching
- * @param  object  $needles  - array you are looking at.
- * @param  integer $offset   - offest if you want it
- * @return see url for diff returns
- */
-function _strposm_min2($haystack, $needles, $offset = 0) {
-  $pattern = '('.implode('|', array_map('preg_quote', (array)$needles)).')';
-  return preg_match($pattern, $haystack, $matches, PREG_OFFSET_CAPTURE, $offset)
-           ? array_reverse($matches[0])
-           : array(false, null);
 }

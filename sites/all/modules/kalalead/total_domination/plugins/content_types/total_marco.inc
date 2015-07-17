@@ -88,7 +88,11 @@ function total_macro_form_submit($form, &$form_state) {
       $line_fix = str_replace("\0", "", $line_fix);
       $line_fix = str_replace("??", "", $line_fix);
       $line_fix = preg_replace('/\s+/', '', $line_fix);
-      $lines[] = $line_fix;
+      // Check for a period to reduce total checks and times.
+      $line_trill = (strpos($line_fix,'.') !== false) ? true : false;
+      if ($line_trill) {
+        $lines[] = $line_fix;
+      }
     }
     fclose($handle);
     // Clean up temp files.
