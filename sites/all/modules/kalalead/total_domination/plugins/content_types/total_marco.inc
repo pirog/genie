@@ -99,19 +99,19 @@ function total_macro_form_submit($form, &$form_state) {
     file_delete($file);
     file_unmanaged_delete($uri);
 
-    foreach ($lines as $line) {
-      $operations[] = array('total_domination_macro_batch', array($line));
-    }
     // Set up the global domains var.
-    _total_domination_macro_domains();
-
-    $batch = array(
-      'title' => t('Making this so super tronic...'),
-      'operations' => $operations,
-      'finished' => 'total_domination_batch_macro_finished',
-      'file' => drupal_get_path('module', 'total_domination') . '/total_domination.batch-macro.inc',
-    );
-    batch_set($batch);
+    $domains = _total_domination_macro_domains();
+    foreach ($lines as $line) {
+      foreach ($domains as $domain) {
+        if (strpos($line, $domain) !== false) {
+          $url = 'http://' . trim($line);
+          $results[] = $url;
+        }
+      }
+    }
+    // IT IS TIMING OUT HERE, WHY???  NEED TO PSOSIBLY DO THIS AND HAVE IT EMAIL ON FINISH?
+    // HAVE IT JUST GO TO A THANK YOU FORM AFTER SUBMIT AND THEN EMAIL AFTER.
+    _total_domination_save_csv($results);
   } else {
     drupal_set_message(t('Could not open file!'), 'error', FALSE);
   }
@@ -120,14 +120,42 @@ function total_macro_form_submit($form, &$form_state) {
 
 /**
  * List of domain suffixes from the interwebz
- * Easier to set this as a Global since we dont have to run it everytime as it was
- * < PHP 5.6 doesnt allow constants as arrays very easily
- * so this is the easiest way to do this right meow.
  *
- * @return global object domain suffixes
+ * @return object domain suffixes
  */
 function _total_domination_macro_domains() {
-  variable_set('total_domination_macro_domains', array(
+  return array(
 '.ac','.ac.uk','.ad','.ae','.aero','.af','.ag','.ai','.al','.am','.an','.ao','.aq','.ar','.arpa','.as','.asia','.at','.au','.aw','.ax','.az','.ba','.bb','.bd','.be','.bf','.bg','.bh','.bi','.biz','.bj','.bm','.bn','.bo','.br','.bs','.bt','.bv','.bw','.by','.bz','.ca','.cat','.cc','.cd','.cf','.cg','.ch','.ci','.ck','.cl','.cm','.cn','.co','.co.uk','.com','.coop','.cr','.cs','.cu','.cv','.cx','.cy','.cz','.dd','.de','.dj','.dk','.dm','.do','.dz','.ec','.edu','.ee','.eg','.eh','.er','.es','.et','.eu','.fi','.firm','.fj','.fk','.fm','.fo','.fr','.fx','.ga','.gb','.gd','.ge','.gf','.gh','.gi','.gl','.gm','.gn','.gov','.gov.uk','.gp','.gq','.gr','.gs','.gt','.gu','.gw','.gy','.hk','.hm','.hn','.hr','.ht','.hu','.id','.ie','.il','.im','.in','.info','.int','.io','.iq','.ir','.is','.it','.je','.jm','.jo','.jobs','.jp','.ke','.kg','.kh','.ki','.km','.kn','.kp','.kr','.kw','.ky','.kz','.la','.lb','.lc','.li','.lk','.lr','.ls','.lt','.ltd.uk','.lu','.lv','.ly','.ma','.mc','.md','.me','.me.uk','.mg','.mh','.mil','.mk','.ml','.mm','.mn','.mo','.mobi','.mod.uk','.mp','.mq','.mr','.ms','.mt','.mu','.museum','.mv','.mw','.mx','.my','.mz','.na','.name','.nato','.nc','.ne','.net','.net.uk','.nf','.ng','.nhs.uk','.ni','.nl','.no','.nom','.np','.nr','.nt','.nu','.nz','.om','.org','.org.uk','.pa','.pe','.pf','.pg','.ph','.pk','.pl','.plc.uk','.pm','.pn','.post','.pr','.pro','.ps','.pt','.pw','.py','.qa','.re','.ro','.rs','.ru','.rw','.sa','.sb','.sc','.sch.uk','.sd','.se','.sg','.sh','.si','.sj','.sk','.sl','.sm','.sn','.so','.sr','.ss','.st','.store','.su','.sv','.sy','.sz','.tc','.td','.tel','.tf','.tg','.th','.tj','.tk','.tl','.tm','.tn','.to','.tp','.tr','.travel','.tt','.tv','.tw','.tz','.ua','.ug','.uk','.um','.us','.uy','.va','.vc','.ve','.vg','.vi','.vn','.vu','.web','.wf','.ws','.xxx','.ye','.yt','.yu','.za','.zm','.zr','.zw',
+  );
+}
+
+/**
+ * /Create a CSV.
+ *
+ * @param object $results
+ *   Success results
+ *
+ * @return
+ *
+ */
+function _total_domination_save_csv($results) {
+  // Use date to win
+  $now = date('dMY-His', strtotime('now'));
+  $textfile_name = 'sites/default/files/' . $now . '.txt';
+  // Add TXT File
+  $fp = fopen($textfile_name, 'w');
+  // Trill out the array:
+  $results = array_unique($results);
+  foreach ($results as $result) {
+    fwrite($fp, $result . "\n");
+  }
+  fclose($fp);
+  // Win out the node.
+  $uri = 'public://' . $now . '.txt';
+
+  file_transfer($uri, array(
+    'Content-disposition' => 'attachment; filename='. $textfile_name,
+    'Content-Type' => 'text/plain; utf-8',
   ));
+  // One day figure out how to redirct after file transfer.
 }
