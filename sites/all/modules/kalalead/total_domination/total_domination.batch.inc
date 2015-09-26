@@ -119,14 +119,15 @@ function _total_domination_curl($url) {
   // Many tries and headaches but this curl gets em all
   $agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)';
   $ch = curl_init();
-  curl_setopt($ch, CURLOPT_URL,$url);
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
   curl_setopt($ch, CURLOPT_ENCODING,  '');
   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
   curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
   curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10000);
+  curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
   curl_setopt($ch, CURLOPT_USERAGENT, $agent);
   $check = curl_exec($ch);
   $info = curl_getinfo($ch);
