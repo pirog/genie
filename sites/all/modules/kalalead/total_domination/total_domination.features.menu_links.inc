@@ -41,7 +41,7 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -46,
+    'weight' => -47,
     'customized' => 1,
   );
   // Exported menu link: main-menu_logout:user/logout
@@ -61,7 +61,7 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -44,
+    'weight' => -45,
     'customized' => 1,
   );
   // Exported menu link: main-menu_new-leads:admin/kalalead/lead/new
@@ -78,7 +78,7 @@ function total_domination_menu_default_menu_links() {
     'external' => 0,
     'has_children' => 0,
     'expanded' => 0,
-    'weight' => -47,
+    'weight' => -48,
     'customized' => 1,
   );
 
