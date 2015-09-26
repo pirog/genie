@@ -219,7 +219,7 @@ $databases = array (
     array (
       'database' => 'drupal',
       'username' => 'drupal',
-      'password' => 'QDSt0o5nWF',
+      'password' => 'jU4vlSD9n6',
       'host' => 'localhost',
       'port' => '',
       'driver' => 'mysql',
@@ -579,3 +579,12 @@ $conf['404_fast_html'] = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN"
  * Remove the leading hash signs to disable.
  */
 # $conf['allow_authorize_operations'] = FALSE;
+
+$conf['preprocess_css'] = 1;
+$conf['preprocess_js'] = 1;
+$conf['page_cache_maximum_age'] = 900;
+$conf['cache'] = 1;
+$conf['advagg_skip_404_check'] = TRUE;
+$conf['image_resize_filter_threshold'] = 1000;
+$conf['page_compression'] = 0;
+$conf['cache_lifetime'] = 0;
