@@ -104,153 +104,12 @@ function total_domination_views_default_views() {
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['force_single'] = 0;
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_settings']['entity_load_capacity'] = '10';
   $handler->display->display_options['fields']['views_bulk_operations']['vbo_operations'] = array(
-    'action::node_assign_owner_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_delete_item' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_delete_revision' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_script_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_sticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_make_unsticky_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::views_bulk_operations_modify_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'show_all_tokens' => 1,
-        'display_values' => array(
-          '_all_' => '_all_',
-        ),
-      ),
-    ),
     'action::node_export_dsv_action' => array(
       'selected' => 1,
       'postpone_processing' => 1,
       'skip_confirmation' => 1,
       'override_label' => 1,
       'label' => 'EXPORT DSV',
-    ),
-    'action::node_export_json_action' => array(
-      'selected' => 1,
-      'postpone_processing' => 1,
-      'skip_confirmation' => 1,
-      'override_label' => 1,
-      'label' => 'EXPORT JSON',
-    ),
-    'action::node_export_xml_action' => array(
-      'selected' => 1,
-      'postpone_processing' => 1,
-      'skip_confirmation' => 1,
-      'override_label' => 1,
-      'label' => 'EXPORT XML',
-    ),
-    'action::views_bulk_operations_argument_selector_action' => array(
-      'selected' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-      'settings' => array(
-        'url' => '',
-      ),
-    ),
-    'action::node_promote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_publish_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_unpromote_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_save_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::system_send_email_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::panelizer_set_status_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_unpublish_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::node_unpublish_by_keyword_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
-    ),
-    'action::pathauto_node_update_action' => array(
-      'selected' => 0,
-      'postpone_processing' => 0,
-      'skip_confirmation' => 0,
-      'override_label' => 0,
-      'label' => '',
     ),
   );
   /* Field: Content: URL */
@@ -278,42 +137,18 @@ function total_domination_views_default_views() {
   $handler->display->display_options['fields']['field_drupal_version']['id'] = 'field_drupal_version';
   $handler->display->display_options['fields']['field_drupal_version']['table'] = 'field_data_field_drupal_version';
   $handler->display->display_options['fields']['field_drupal_version']['field'] = 'field_drupal_version';
+  $handler->display->display_options['fields']['field_drupal_version']['label'] = 'CMS';
   $handler->display->display_options['fields']['field_drupal_version']['element_type'] = '0';
   $handler->display->display_options['fields']['field_drupal_version']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_drupal_version']['element_default_classes'] = FALSE;
-  /* Field: Content: First Name */
-  $handler->display->display_options['fields']['field_first_name']['id'] = 'field_first_name';
-  $handler->display->display_options['fields']['field_first_name']['table'] = 'field_data_field_first_name';
-  $handler->display->display_options['fields']['field_first_name']['field'] = 'field_first_name';
-  $handler->display->display_options['fields']['field_first_name']['element_type'] = '0';
-  $handler->display->display_options['fields']['field_first_name']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_first_name']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['field_first_name']['group_rows'] = FALSE;
-  $handler->display->display_options['fields']['field_first_name']['delta_limit'] = '5';
-  $handler->display->display_options['fields']['field_first_name']['delta_offset'] = '0';
-  $handler->display->display_options['fields']['field_first_name']['separator'] = '^^';
-  /* Field: Content: Last Name */
-  $handler->display->display_options['fields']['field_last_name']['id'] = 'field_last_name';
-  $handler->display->display_options['fields']['field_last_name']['table'] = 'field_data_field_last_name';
-  $handler->display->display_options['fields']['field_last_name']['field'] = 'field_last_name';
-  $handler->display->display_options['fields']['field_last_name']['element_type'] = '0';
-  $handler->display->display_options['fields']['field_last_name']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_last_name']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['field_last_name']['group_rows'] = FALSE;
-  $handler->display->display_options['fields']['field_last_name']['delta_limit'] = '5';
-  $handler->display->display_options['fields']['field_last_name']['delta_offset'] = '0';
-  $handler->display->display_options['fields']['field_last_name']['separator'] = '^^';
-  /* Field: Content: Job Title */
-  $handler->display->display_options['fields']['field_job_title']['id'] = 'field_job_title';
-  $handler->display->display_options['fields']['field_job_title']['table'] = 'field_data_field_job_title';
-  $handler->display->display_options['fields']['field_job_title']['field'] = 'field_job_title';
-  $handler->display->display_options['fields']['field_job_title']['element_type'] = '0';
-  $handler->display->display_options['fields']['field_job_title']['element_label_colon'] = FALSE;
-  $handler->display->display_options['fields']['field_job_title']['element_default_classes'] = FALSE;
-  $handler->display->display_options['fields']['field_job_title']['group_rows'] = FALSE;
-  $handler->display->display_options['fields']['field_job_title']['delta_limit'] = '5';
-  $handler->display->display_options['fields']['field_job_title']['delta_offset'] = '0';
-  $handler->display->display_options['fields']['field_job_title']['separator'] = '^^';
+  /* Field: Content: Post date */
+  $handler->display->display_options['fields']['created']['id'] = 'created';
+  $handler->display->display_options['fields']['created']['table'] = 'node';
+  $handler->display->display_options['fields']['created']['field'] = 'created';
+  $handler->display->display_options['fields']['created']['label'] = 'Date Added';
+  $handler->display->display_options['fields']['created']['date_format'] = 'custom';
+  $handler->display->display_options['fields']['created']['custom_date_format'] = 'M d Y';
+  $handler->display->display_options['fields']['created']['second_date_format'] = 'panopoly_time';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
