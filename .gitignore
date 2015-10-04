@@ -1,1 +1,4 @@
-# Allow all, bla ha ha ha ha
+# Allow all, except FILEZ, bla ha ha ha ha
+/sites/*/files
+/sites/*/private
+/files/*
