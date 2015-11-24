@@ -312,7 +312,7 @@ function _batch_process() {
     $queue = _batch_queue($current_set);
 
     // If we are in progressive mode, break processing after 1 second.
-    if ($batch['progressive'] && timer_read('batch_processing') > 30000) {
+    if ($batch['progressive'] && timer_read('batch_processing') > 1000) {
       // Record elapsed wall clock time.
       $current_set['elapsed'] = round((microtime(TRUE) - $current_set['start']) * 1000, 2);
       break;
@@ -460,10 +460,10 @@ function _batch_finished() {
       if (isset($batch_set['file']) && is_file($batch_set['file'])) {
         include_once DRUPAL_ROOT . '/' . $batch_set['file'];
       }
-      if (function_exists($batch_set['finished'])) {
+      if (is_callable($batch_set['finished'])) {
         $queue = _batch_queue($batch_set);
         $operations = $queue->getAllItems();
-        $batch_set['finished']($batch_set['success'], $batch_set['results'], $operations, format_interval($batch_set['elapsed'] / 1000));
+        call_user_func($batch_set['finished'], $batch_set['success'], $batch_set['results'], $operations, format_interval($batch_set['elapsed'] / 1000));
       }
     }
   }
