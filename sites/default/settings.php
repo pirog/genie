@@ -605,3 +605,4 @@ $conf['cache_default_class'] = 'APDQCache';
 $conf['lock_inc'] = 'sites/all/modules/apdqc/apdqc.lock.inc';
 $conf['session_inc'] = 'sites/all/modules/apdqc/apdqc.session.inc';
 $conf['apdqc_call_hook_on_clear'] = TRUE;
+$conf['page_cache_invoke_hooks'] = FALSE;
