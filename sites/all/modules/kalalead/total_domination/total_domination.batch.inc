@@ -226,14 +226,28 @@ function _total_domination_node_create($title, $cms, $url) {
  *    the title and version OR return FALSE if not drupal.
  */
 function _total_domination_check_drupal($url, $check) {
-  // Check for up to Drupal 7.
-  if (strpos($check, 'not-logged-in') !== false) {
+  // Check for up to Drupal 8.
+  if (strpos($check, 'not-logged-in') !== false ||
+      strpos($check, 'Drupal 8') !== false ||
+      strpos($check, 'data-drupal-selector') !== false) {
     // Set the title.
     $title = _total_domination_check_title($url, $check);
     // Check CHANGELOG for versions.
     $versions = _total_domination_curl($url . '/CHANGELOG.txt');
     list($version, $info) = $versions;
-    // If page is there.
+
+    // Drupal 8 check
+    if ($info['http_code'] == 404) {
+      $versions = _total_domination_curl($url . '/core/CHANGELOG.txt');
+      list($version, $info) = $versions;
+      if ($info['http_code'] == 200) {
+        $ver_get = 'Drupal 8 Site';
+        $result = array($title, $ver_get);
+        return $result;
+      }
+    }
+
+    // Drupal 7 and below, If page is there.
     if ($info['http_code'] == 200) {
       $ver_get = str_replace(array("\r", "\n"), "", substr($version, 0, 12));
       $ver_get = substr(trim($ver_get), -4);
