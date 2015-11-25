@@ -67,7 +67,6 @@ function total_clean_form($form, &$form_state) {
  * Validate the form of doom
  */
 function total_clean_form_validate($form, &$form_state) {
-  $test = '1';
   // Make sure the defualt options isnt chosen.
   if ($form_state['values']['whatwedoin'] == '00') {
     form_set_error('whatwedoin', 'You must say WHAT WE BE DOIN HERE');
@@ -124,7 +123,7 @@ function _total_clean_caches() {
  * 86 the BATCH table.
  */
 function _total_clean_batch_cleanse() {
-  // See if any rowz to cleanse.
+  // See if any rowz to cleanse in batch.
   $row = db_query('SELECT * FROM batch')->rowCount();
   // Then DO IT.
   if ($row > 0) {
@@ -133,6 +132,17 @@ function _total_clean_batch_cleanse() {
   }
   else {
     drupal_set_message(t('The Batch Tables hasth already been cleansed of evil, WE WIN'), 'status', FALSE);
+  }
+
+  // See if any rowz to cleanse in queue.
+  $row = db_query('SELECT * FROM queue')->rowCount();
+  // Then DO IT.
+  if ($row > 0) {
+    db_query('DELETE FROM queue');
+    drupal_set_message(t('The Queue Tables hasth been cleansed of :row Rowz', array(':row' => $row)), 'status', FALSE);
+  }
+  else {
+    drupal_set_message(t('The Queue Tables hasth already been cleansed of evil, WE WIN'), 'status', FALSE);
   }
 }
 
