@@ -22,13 +22,14 @@ function kalatheme_bootstrap_library_form() {
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
+  $l_options = array('attributes' => array('target' => '_blank'));
   $form['bootstrap']['bootstrap_library'] = array(
     '#type' => 'select',
     '#title' => t('Select a Bootstrap library.'),
-    '#description' => t('Select a Bootstrap library to use with your subtheme. Visit <a href="@bootswatch">Bootswatch</a> for more info. Select "custom" to upload a third party Bootstrap library such as one from <a href="@wrapbootstrap">Wrapbootstrap</a> or built using Bootstrap\'s <a href="@bootcustom">Customization Utility</a>.', array(
-      '@bootswatch' => 'http://bootswatch.com/',
-      '@wrapbootstrap' => 'http://wrapbootstrap.com/',
-      '@bootcustom' => 'http://getbootstrap.com/customize/',
+    '#description' => t('Select a Bootstrap library to use with your subtheme. Visit !bootswatch for more info. Select "custom" to upload a third party Bootstrap library such as one from !wrapbootstrap or built using Bootstrap\'s !bootcustom. Note that at present you can\'t add a Bootswatch or custom library to an existing theme, you need to build a new subtheme by checking the \'Build and enable a custom subtheme\' checkbox below.', array(
+      '!bootswatch' => l('Bootswatch', 'http://bootswatch.com/', $l_options),
+      '!wrapbootstrap' => l('Wrapbootstrap', 'http://wrapbootstrap.com/', $l_options),
+      '!bootcustom' => l('Customization Utility', 'http://getbootstrap.com/customize/', $l_options),
     )),
     '#ajax' => array(
       'callback' => 'kalatheme_ajax_bootstrap_preview_submit',
@@ -79,23 +80,34 @@ function kalatheme_bootstrap_library_form() {
 function kalatheme_backend_check_form() {
   $form = array();
 
-  if (kalatheme_backend_check()) {
-    $form['backend_check'] = array(
+  if (isset($_SERVER['PANTHEON_ENVIRONMENT'])) {
+    $form['pantheon_check'] = array(
       '#weight' => -100,
-      '#prefix' => '<div class="alert alert-success">',
-      '#markup' => t("Your webserver is correctly configured to allow for custom Bootstrap libraries and subtheme generation!"),
+      '#prefix' => '<div class="alert alert-info">',
+      '#markup' => t("You are on Pantheon. <strong>You need to set the connection mode to SFTP</strong> to allow for custom Bootstrap libraries and subtheme generation!"),
       '#suffix' => '</div>',
     );
   }
   else {
-    $form['backend_check'] = array(
-      '#weight' => -100,
-      '#prefix' => '<div class="alert alert-danger">',
-      '#markup' => t("If you want Kalatheme to be able to use custom Bootstrap libraries or generate subthemes automatically please properly configure your webserver."),
-        // @todo add link to docs here
-      '#suffix' => '</div>',
-    );
+    if (kalatheme_backend_check()) {
+      $form['backend_check'] = array(
+        '#weight' => -100,
+        '#prefix' => '<div class="alert alert-success">',
+        '#markup' => t("Your webserver is correctly configured to allow for custom Bootstrap libraries and subtheme generation!"),
+        '#suffix' => '</div>',
+      );
+    }
+    else {
+      $form['backend_check'] = array(
+        '#weight' => -100,
+        '#prefix' => '<div class="alert alert-danger">',
+        '#markup' => t("If you want Kalatheme to be able to use custom Bootstrap libraries or generate subthemes automatically please properly configure your webserver."),
+          // @todo add link to docs here
+        '#suffix' => '</div>',
+      );
+    }
   }
+
   return $form;
 }
 
@@ -218,7 +230,7 @@ function kalatheme_custom_bootstrap_library_submit(&$form, &$form_state) {
   // Use a custom bootstrap library
   // This can either be a file upload or a URL although the URL option really
   // only works with drush
-  if ($_FILES['files']['name']['bootstrap_upload'] || !empty($form_state['values']['bootstrap_upload'])) {
+  if (!empty($_FILES['files']['name']['bootstrap_upload']) || !empty($form_state['values']['bootstrap_upload'])) {
     $projects[] = kalatheme_custom_bootstrap_library_build($form_state['values']);
   }
   // Run the batch operation if we have things to move
@@ -470,7 +482,7 @@ function kalatheme_run_install($filetransfer, $projects) {
   // but _batch_process prepends DRUPAL_ROOT so we need to strip that
   // out here as well
   $file = dirname(__FILE__) . '/../kalatheme.authorize.inc';
-  $file = str_replace(DRUPAL_ROOT . '/', '', $file);
+  $file = str_replace(DRUPAL_ROOT . DIRECTORY_SEPARATOR, '', $file);
 
   // Set the batch up!
   $batch = array(

@@ -10,9 +10,9 @@
 require_once dirname(__FILE__) . '/includes/utils.inc';
 
 // Asset stuff
-define('KALATHEME_BOOTSTRAP_CSS', '//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css');
-define('KALATHEME_BOOTSTRAP_JS', '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js');
-define('KALATHEME_FONTAWESOME_CSS', '//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css');
+define('KALATHEME_BOOTSTRAP_CSS', '//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css');
+define('KALATHEME_BOOTSTRAP_JS', '//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js');
+define('KALATHEME_FONTAWESOME_CSS', '//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css');
 
 // Grid size constants
 define('KALATHEME_GRID_SIZE', kalatheme_get_grid_size());
@@ -115,12 +115,18 @@ function kalatheme_process_page(&$variables) {
   // Use the CDN if not using libraries
   if (!kalatheme_use_libraries()) {
     $library = theme_get_setting('bootstrap_library');
-    if ($library !== 'none') {
+    if ($library !== 'none' && !empty($library)) {
       // Add the JS
       drupal_add_js($base['scheme'] . ":" . KALATHEME_BOOTSTRAP_JS, 'external');
+
       // Add the CSS
-      $css = ($library === 'default') ? KALATHEME_BOOTSTRAP_CSS : kalatheme_get_bootswatch_theme($library)->cssCdn;
-      drupal_add_css($base['scheme'] . ":" . $css, 'external');
+      if ($library == 'default') {
+        $css = $base['scheme'] . ':' . KALATHEME_BOOTSTRAP_CSS;
+      }
+      else {
+        $css = kalatheme_get_bootswatch_theme($library)->cssCdn;
+      }
+      drupal_add_css($css, 'external');
     }
   }
   // Use Font Awesome

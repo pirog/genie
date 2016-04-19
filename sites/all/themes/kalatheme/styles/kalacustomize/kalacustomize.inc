@@ -7,7 +7,7 @@
 
 $plugin = array(
   'title' => t('Kalacustomize'),
-  'description' => t('Customize elements, visbility and classes with Twitter Bootstrap'),
+  'description' => t('Customize elements, visibility and classes with Twitter Bootstrap'),
   'render region' => 'kalatheme_kalacustomize_render_region',
   'render pane' => 'kalatheme_kalacustomize_render_pane',
   'settings form' => 'kalatheme_kalacustomize_pane_settings_form',
@@ -23,8 +23,8 @@ function theme_kalatheme_kalacustomize_render_region($vars) {
   $settings = $vars['settings'];
 
   $settings['attributes'] = '';
-  $settings['attributes'] .= _kalatheme_get_styles($settings['devices']);
-  $settings['attributes'] .= _kalatheme_get_styles($settings['pane_style']);
+  $settings['attributes'] .= isset($settings['devices']) ? _kalatheme_get_styles($settings['devices']) : '';
+  $settings['attributes'] .= isset($settings['pane_style']) ? _kalatheme_get_styles($settings['pane_style']) : '';
 
     // Theme.
   if (!empty($settings['theme']) && $settings['theme']) {
@@ -33,7 +33,6 @@ function theme_kalatheme_kalacustomize_render_region($vars) {
   else {
     $output = implode(PHP_EOL, $content);
   }
-
   // Wrap
   if (!empty($output)) {
     $content_wrapper = _kalatheme_wrapper_wrap($settings);
@@ -55,10 +54,10 @@ function theme_kalatheme_kalacustomize_render_pane($vars) {
     $content->css_class = '';
   }
 
-  if (isset($settigs['devices'])) {
+  if (isset($settings['devices'])) {
     $content->css_class .= _kalatheme_get_styles($settings['devices']);
   }
-  if (isset($settigs['pane_style'])) {
+  if (isset($settings['pane_style'])) {
     $content->css_class .= _kalatheme_get_styles($settings['pane_style']);
   }
   $output = theme('panels_pane', $vars);

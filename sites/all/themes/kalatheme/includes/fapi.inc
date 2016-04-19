@@ -72,9 +72,59 @@ function kalatheme_process_input(&$element, &$form_state) {
   if (!empty($element['#type']) && (in_array($element['#type'], $types))) {
     $element['#attributes']['class'][] = 'form-control';
   }
+
   return $element;
 }
 
+/**
+ * Implements theme_textfield().
+ */
+function kalatheme_textfield($variables) {
+  $element = $variables['element'];
+  $element['#attributes']['type'] = 'text';
+  element_set_attributes($element, array(
+    'id',
+    'name',
+    'value',
+    'size',
+    'maxlength',
+  ));
+  
+  $input_classes = array('form-text');
+  
+  // Add a class to indicate if FontAwesome theme setting is turned on. Don't 
+  // worry this doesn't clash with any existing fa- classes.
+  $fa_on = theme_get_setting('fontawesome');
+  if ($fa_on) {
+    $input_classes[] = 'fa-on';
+  }
+  
+  _form_set_class($element, $input_classes);
+  
+  $output = '<input' . drupal_attributes($element['#attributes']) . ' />';
+
+  $extra = '';
+  if (isset($element['#autocomplete_path']) && drupal_valid_path($element['#autocomplete_path'])) {
+    drupal_add_library('system', 'drupal.autocomplete');
+    $element ['#attributes']['class'][] = 'form-autocomplete';
+
+    $attributes = array();
+    $attributes ['type'] = 'hidden';
+    $attributes ['id'] = $element ['#attributes']['id'] . '-autocomplete';
+    $attributes ['value'] = url($element ['#autocomplete_path'], array('absolute' => TRUE));
+    $attributes ['disabled'] = 'disabled';
+    $attributes ['class'][] = 'autocomplete';
+    $extra = '<input' . drupal_attributes($attributes) . ' />';
+    
+    // Add form control feedback if FontAwesome is available.
+    if ($fa_on) {
+      $icon = '<span class="fa fa-circle-o-notch form-control-feedback" aria-hidden="true"></span>';
+      $output = $output . $icon;
+    }
+  }
+
+  return $output . $extra;
+}
 
 /**
  * Implements theme_form_element().
@@ -122,6 +172,11 @@ function kalatheme_form_element($variables) {
     }
     else {
       $attributes['class'][] = 'form-group';
+      
+      //
+      if (isset($element['#autocomplete_path']) && drupal_valid_path($element['#autocomplete_path'])) {
+        $attributes['class'][] = 'has-feedback';
+      }
     }
   }
 
@@ -138,6 +193,7 @@ function kalatheme_form_element($variables) {
 
   switch ($element['#title_display']) {
     case 'before':
+    case 'permissions':
     case 'invisible':
       $output .= ' ' . theme('form_element_label', $variables);
       $output .= ' ' . $prefix . $element['#children'] . $suffix . "\n";
@@ -190,7 +246,7 @@ function kalatheme_form_element_label($variables) {
   if ($element['#title_display'] == 'after' && !$is_radio_or_checkbox) {
     $attributes['class'] = 'option';
   }
-  elseif ($element['#title_display'] == 'invisible') {
+  elseif ($element['#title_display'] == 'invisible' || $element['#title_display'] == 'permissions') {
     $attributes['class'] = 'element-invisible';
   }
 
@@ -199,7 +255,7 @@ function kalatheme_form_element_label($variables) {
   }
 
   $output = '';
-  if ($is_radio_or_checkbox && isset($element['#children'])) {
+  if ($is_radio_or_checkbox && $element['#title_display'] != 'permissions' && isset($element['#children'])) {
     $output .= $element['#children'];
   }
 

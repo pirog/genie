@@ -6,7 +6,7 @@
  */
 
 // Constants
-define('KALATHEME_BOOTSWATCH_API', 'http://api.bootswatch.com/3/');
+define('KALATHEME_BOOTSWATCH_API', 'https://bootswatch.com/api/3.json');
 
 // Use Libraries intregration if applicable
 if (kalatheme_use_libraries()) {
@@ -341,9 +341,5 @@ function kalatheme_has_write_access() {
  * Return the libraries dir to check
  */
 function kalatheme_lib_dir() {
-  if (!is_dir('sites/all/libraries')) {
-    mkdir(DRUPAL_ROOT . '/sites/all/libraries');
-  }
   return is_dir('sites/all/libraries') ? 'sites/all/libraries' : 'sites/all';
 }
-

@@ -10,19 +10,6 @@
 require_once dirname(__FILE__) . '/../views/plugins/views_plugin_style_grid_bootstrap.inc';
 
 /**
- * Implements template_preprocess().
- */
-function kalatheme_preprocess_views_view(&$variables) {
-  $view = $variables['view'];
-
-  // Add a .row class to wrap .views-row.
-  $variables['view_content_class'] = 'view-content';
-  if ($view->style_plugin->plugin_name != 'list') {
-    $variables['view_content_class'] .= ' row';
-  }
-}
-
-/**
  * Implement hook_views_plugins_alter()
  *
  * We are using this so we can add some responsive Bootstrap options to
@@ -44,16 +31,22 @@ function kalatheme_preprocess_views_view_grid(&$variables) {
   $variables['gridsize'] = kalatheme_get_grid_size();
   $responsive_tiers = array('xs', 'sm', 'lg');
   foreach ($responsive_tiers as $tier) {
-    if (empty($variables['options']['columns_' . $tier])) {
+    if (!isset($variables['options']['responsive_toggle'])) {
       $variables['options']['columns_' . $tier] = 1;
     }
-    if ($variables['gridsize'] % $variables['options']['columns_' . $tier] === 0) {
+    if (!empty($variables['options']['columns_' . $tier]) &&
+      $variables['gridsize'] % $variables['options']['columns_' . $tier] === 0
+    ) {
       $variables[$tier] = $variables['gridsize'] / $variables['options']['columns_' . $tier];
     }
   }
   // This is set using the default grid columns value not columns_tier
   if ($variables['gridsize'] % $variables['options']['columns'] === 0) {
     $variables['md'] = $variables['gridsize'] / $variables['options']['columns'];
+    // We need to do ths too
+    if (!isset($variables['options']['responsive_toggle']))  {
+      $variables['lg'] = $variables['gridsize'] / $variables['options']['columns'];
+    }
   }
 }
 
@@ -152,7 +145,7 @@ function kalatheme_views_mini_pager($vars) {
       'items' => $items,
       'title' => NULL,
       'type' => 'ul',
-      'attributes' => array('class' => array('pagination')),
+      'attributes' => array('class' => array('pager', 'pagination')),
     ));
   }
 }
