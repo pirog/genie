@@ -3,4 +3,10 @@
 #progress.batch-processed .message {
   font-size: 18px;
 }
- 
+
+.radio input[type=radio],
+.radio-inline input[type=radio],
+.checkbox input[type=checkbox],
+.checkbox-inline input[type=checkbox] {
+  margin-left: -5px !important;
+}
