@@ -1,3 +1,51 @@
+Panopoly 7.x-1.33, 2016-04-14
+----------------------
+- Update Panopoly Theme for Issue #2706279 by dsnopek: Remove the Respondjs
+  library from Panopoly.
+- Update Panopoly Core for Issue #2706259: Update to Features 2.9 for SA-
+  CONTRIB-2016-020.
+- Update Panopoly Search for Issue #2694253 by dsnopek, cboyden: Don't log
+  searches for empty keywords.
+- Update Panopoly Core for Issue #2695563 by dsnopek: Remove debug code from
+  Panels IPE.
+- Update Panopoly Magic and Test for Issue #2467073 by cboyden, dsnopek,
+  segovia94: Preview fieldset overflows in Firefox if using a very large image.
+- Start testing upgrades from the 1.32 release.
+- Restored drupal-org.make after the 1.32 release.
+
+Panopoly 7.x-1.32, 2016-03-03
+----------------------
+- Update Panopoly Core for Issue #2679947 by cboyden: Security update to
+  fieldable panels panes 1.8.
+- Start testing upgrades from the 1.31 release.
+- Restored drupal-org.make after the 1.31 release.
+
+Panopoly 7.x-1.31, 2016-02-25
+----------------------
+- Update to Drupal 7.43 for SA-CORE-2016-001.
+- Update Panopoly Widgets and WYSIWYG for Issue #2646372 by dsnopek:
+  Panopoly_widgets Schema Update 7016 Integrity constraint violation.
+- Phing build exposes too much to the public.
+- Update Panopoly Widgets for Issue #2653834 by dsnopek: Pass entity to
+  'panopoly_spotlight_wrapper' and 'panopoly_spotlight_view' theme functions.
+- Start testing upgrades from the 1.30 release.
+- Restored drupal-org.make after the 1.30 release.
+
+Panopoly 7.x-1.30, 2016-01-06
+----------------------
+- Update Panopoly Test for Issue #2645668: "Use an image from elsewhere on the
+  web" test failing.
+- Assign UID 1 to 'administrator' role on install.
+- Update Panopoly Core for Issue #2645654: Update field_group to 1.5 for SA-
+  CONTRIB-2016-001.
+- Update Panopoly Admin for Issue #2637004 by humansky: Default admin role.
+- Update Panopoly Widgets for Issue #2623662 by dsnopek: Access denied when
+  adding Media in WYSIWYG.
+- Update Panopoly Widgets for Issue #2617618 by dsnopek: Don't set default image
+  for image widget.
+- Start testing upgrades from the 1.29 release.
+- Restored drupal-org.make after the 1.29 release.
+
 Panopoly 7.x-1.29, 2015-11-18
 ----------------------
 - Update Panopoly Widgets for Issue #2618206 by mpotter: Patching media for
